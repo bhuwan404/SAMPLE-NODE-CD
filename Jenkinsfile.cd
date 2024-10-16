@@ -53,7 +53,7 @@ pipeline {
                 withCredentials([
                     gitUsernamePassword(credentialsId: 'jk-gh-tk', gitToolName: 'Default')
                 ]) {
-                    // Add, commit, and push the changes to the repository
+                    // Add, commit and push the changes to the repository
                     sh "git add ${PROJECT}/${VALUES_FILE}"
                     sh "git commit -m 'Image version updated to ${IMAGE_TAG} in ${VALUES_FILE}' -a"
                     sh "git pull --rebase origin ${BRANCH_NAME}"

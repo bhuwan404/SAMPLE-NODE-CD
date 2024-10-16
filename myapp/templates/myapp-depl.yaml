@@ -3,35 +3,26 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    app: myapp
-  name: myapp
+    app: {{ .Values.app.name }}
+  name: {{ .Values.app.name }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: myapp
+      app: {{ .Values.app.name }}
   strategy: {}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: myapp
+        app: {{ .Values.app.name }}
     spec:
       containers:
-      - image: bhuwan405/test-app:14
-        name: test-app
+      - image: {{ .Values.image.repository }}/{{ .Values.image.tag }}
+        name: {{ .Values.app.name }}
         ports:
-        - containerPort: 3000
+        - containerPort: {{ .Values.service.containerPort }}
         env:
-        - name: MONGODB_HOST
-          valueFrom:
-            secretKeyRef:
-              name: myapp
-              key: MONGODB_HOST
-        - name: MONGODB_PORT
-          valueFrom: 
-            secretKeyRef:
-              name: myapp
-              key: MONGODB_PORT     
+          {{- toYaml .Values.env | nindent 12}}  
         resources: {} 
 status: {}
