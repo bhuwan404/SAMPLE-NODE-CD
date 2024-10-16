@@ -1,28 +1,24 @@
 replicaCount: 2
-
 image:
   repository: bhuwan405
   pullPolicy: IfNotPresent
-  tag: "test-app:14"
-
+  tag: "test-app:26"
 service:
   name: myapp
   type: ClusterIP
   containerPort: 3000
   port: 80
-
 env:
-- name: MONGODB_HOST
-  valueFrom:
-    secretKeyRef:
-      name: myapp
-      key: MONGODB_HOST
-- name: MONGODB_PORT
-  valueFrom: 
-    secretKeyRef:
-      name: myapp
-      key: MONGODB_PORT
-
+  - name: MONGODB_HOST
+    valueFrom:
+      secretKeyRef:
+        name: myapp
+        key: MONGODB_HOST
+  - name: MONGODB_PORT
+    valueFrom:
+      secretKeyRef:
+        name: myapp
+        key: MONGODB_PORT
 ingress:
   enabled: true
   className: ""
