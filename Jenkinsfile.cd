@@ -1,0 +1,65 @@
+pipeline {
+    agent any
+
+    environment {
+        // Ensure that IMAGE_TAG is correctly set and used in yq commands
+        UpdateImageCommand = """export IMAGE_TAG=${IMAGE_TAG} && \
+            yq e '.image.tag = "${IMAGE_TAG}"' -i ${PROJECT}/${VALUES_FILE} && \
+            yq e '.image.tag' ${WORKSPACE}/${PROJECT}/${VALUES_FILE}"""
+    }
+
+    stages {
+        // stage('Image Tag Verify') {
+        //     steps {
+        //         script {
+        //             def textToCheck = env.IMAGE_TAG
+        //             def pattern = /^[a-zA-Z0-9_.:-]+$/
+                    
+        //             if (!(textToCheck ==~ pattern)) {
+        //                 error("The image tag contains invalid characters. Only alphanumeric characters, ., :, - and _ are allowed.")
+        //             }
+        //         }
+        //     }
+        // }
+
+        stage('Cloning Git') {
+            steps {
+                withCredentials([
+                    gitUsernamePassword(credentialsId: 'jk-gh-tk', gitToolName: 'Default')
+                ]) {
+                    sh "git reset --hard"
+                    sh "git checkout ${BRANCH_NAME}"
+                    sh "git fetch origin"
+                    sh "git reset --hard origin/${BRANCH_NAME}"
+                    echo 'INFO: project files checked out'
+                }
+            }
+        }
+
+        stage('Update image') {
+            steps {
+                script {
+                    // Print IMAGE_TAG for debugging
+                    sh "echo 'IMAGE_TAG: ${IMAGE_TAG}'"
+                    
+                    // Run the command to update and verify the image tag
+                    sh "${UpdateImageCommand}"
+                }
+            }
+        }
+
+        stage('Git push') {
+            steps {
+                withCredentials([
+                    gitUsernamePassword(credentialsId: 'jk-gh-tk', gitToolName: 'Default')
+                ]) {
+                    // Add, commit, and push the changes to the repository
+                    sh "git add ${PROJECT}/${VALUES_FILE}"
+                    sh "git commit -m 'Image version updated to ${IMAGE_TAG} in ${VALUES_FILE}' -a"
+                    sh "git pull --rebase origin ${BRANCH_NAME}"
+                    sh "git push origin ${BRANCH_NAME}"
+                }
+            }
+        }
+    }
+}
