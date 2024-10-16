@@ -2,9 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "myapp.fullname" . }}-ui
-  labels:
-    {{- include "myapp.labels" . | nindent 4 }}
+  name: {{ .Values.app.name }}-ui
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
