@@ -4,7 +4,7 @@ app:
 image:
   repository: bhuwan405
   pullPolicy: IfNotPresent
-  tag: "test-app:26"
+  tag: "35"
 service:
   name: myapp
   type: ClusterIP
